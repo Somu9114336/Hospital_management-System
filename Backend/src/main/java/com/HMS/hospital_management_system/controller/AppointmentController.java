@@ -40,8 +40,8 @@ public class AppointmentController {
         return ResponseEntity.ok().body(res);
     }
 
-    @GetMapping("/get/patient/{id}")
-    public ResponseEntity<List<AppointmentResponseDto>> getAppointmentForAPatient(@PathVariable Long id) {
+    @GetMapping("/get/myAppointments")
+    public ResponseEntity<List<AppointmentResponseDto>> getAllAppointmentsForPatient(@PathVariable Long id) {
         List<AppointmentResponseDto> res = appointmentsService.getAllAppointmentsForAPatient(id);
         return ResponseEntity.ok().body(res);
     }
@@ -72,9 +72,9 @@ public class AppointmentController {
     }
 
     @GetMapping("/getallmyappointments")
-    public ResponseEntity<List<AppointmentResponseDto>> getAllMyAppointments(Authentication authentication) {
+    public ResponseEntity<List<AppointmentResponseDto>> getAllMyAppointments() {
 
-        List<AppointmentResponseDto> res = appointmentsService.getMyAppointments(authentication.getName());
+        List<AppointmentResponseDto> res = appointmentsService.getMyAppointments();
         return ResponseEntity.ok().body(res);
     }
 }

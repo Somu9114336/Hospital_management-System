@@ -24,6 +24,7 @@ public class DoctorMapper {
 
         DoctorResponseDto dto = new DoctorResponseDto();
 
+        dto.setId(doctors.getId());
         dto.setName(doctors.getName());
         dto.setEmail(doctors.getEmail());
         dto.setSpecialization(doctors.getSpecialization());

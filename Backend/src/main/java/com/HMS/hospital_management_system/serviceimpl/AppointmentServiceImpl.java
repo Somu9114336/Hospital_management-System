@@ -14,6 +14,9 @@ import com.HMS.hospital_management_system.repositary.AppointmentRepository;
 import com.HMS.hospital_management_system.repositary.DoctorRepository;
 import com.HMS.hospital_management_system.repositary.PatientRepositary;
 import com.HMS.hospital_management_system.service.AppointmentsService;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +44,15 @@ public class AppointmentServiceImpl implements AppointmentsService {
     }
 
     @Override
+    @Transactional
     public AppointmentResponseDto bookAppointment(AppointmentRequestDto dto) {
-        Patient patient = patientRepositary.findById(dto.getPatientId()).orElseThrow(() -> new PatientNotFoundException("patient not exists"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        Patient patient = patientRepositary.findByUser_Email(email).orElseThrow(() -> new PatientNotFoundException("patient doesn`t exist"));
+
         Doctors doctors = doctorRepository.findById(dto.getDoctorId()).orElseThrow(() -> new DoctorNotFoundException("doctor not exists"));
 
         if (!doctors.isActive()) {
@@ -57,11 +67,11 @@ public class AppointmentServiceImpl implements AppointmentsService {
 
         if (dto.getAppointmentDate().isBefore(LocalDate.now())) {
             throw new RuntimeException("appointment date must be in future");
-        } else if (dto.getAppointmentDate().isEqual(LocalDate.now()) && dto.getStartTime().isBefore(LocalTime.now())) {
+        } else if (dto.getAppointmentDate().isEqual(LocalDate.now()) && !dto.getStartTime().isAfter(LocalTime.now())) {
             throw new RuntimeException("Appointment time must be in the future");
 
         }
-        boolean ap = appointmentRepositary.hasOverlapping(dto.getPatientId(), dto.getAppointmentDate(), dto.getStartTime(), dto.getEndTime());
+        boolean ap = appointmentRepositary.hasOverlapping(patient.getId(), dto.getAppointmentDate(), dto.getStartTime(), dto.getEndTime());
         if (ap) {
             throw new RuntimeException("Patient already has an appointment during this time");
         }
@@ -103,10 +113,17 @@ public class AppointmentServiceImpl implements AppointmentsService {
     @Override
     @Transactional(readOnly = true)
     public AppointmentResponseDto getAppointmentById(Long id) {
-        Appointment appointment = appointmentRepositary.findById(id).orElseThrow(() -> new AppointmentNotFoundException("no appointment found"));
+
+
+        Appointment appointment = appointmentRepositary.findById(id)
+                .orElseThrow(() ->
+                        new AppointmentNotFoundException("no appointment found"));
+
+        ensureAppointmentAccess(appointment);
 
         return appointmentMapper.toDto(appointment);
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -136,6 +153,7 @@ public class AppointmentServiceImpl implements AppointmentsService {
     public AppointmentResponseDto ResheduleAnAppointment(Long id, AppointmentRequestDto dto) {
 
         Appointment appointment = appointmentRepositary.findById(id).orElseThrow(() -> new AppointmentNotFoundException("no appointment found to reshedule"));
+        ensureAppointmentAccess(appointment);
 
         if (appointment.getStatus().equals(AppointmentStatus.CANCELLED)) {
             throw new RuntimeException("can not reshedule a cancle appointment");
@@ -155,7 +173,7 @@ public class AppointmentServiceImpl implements AppointmentsService {
 
         if (dto.getAppointmentDate().isBefore(LocalDate.now())) {
             throw new RuntimeException("appointment date must be in future");
-        } else if (dto.getAppointmentDate().isEqual(LocalDate.now()) && dto.getStartTime().isBefore(LocalTime.now())) {
+        } else if (dto.getAppointmentDate().isEqual(LocalDate.now()) && !dto.getStartTime().isAfter(LocalTime.now())) {
             throw new RuntimeException("Appointment time must be in the future");
 
         }
@@ -194,6 +212,7 @@ public class AppointmentServiceImpl implements AppointmentsService {
     @Transactional
     public AppointmentResponseDto cancelAnAppointment(Long id) {
         Appointment appointment = appointmentRepositary.findById(id).orElseThrow(() -> new AppointmentNotFoundException("no appointmnt found"));
+        ensureAppointmentAccess(appointment);
 
         if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
             throw new RuntimeException("Appointment already cancled");
@@ -225,12 +244,32 @@ public class AppointmentServiceImpl implements AppointmentsService {
 
 
     @Override
-    public List<AppointmentResponseDto> getMyAppointments(String email) {
+    @Transactional(readOnly = true)
+    public List<AppointmentResponseDto> getMyAppointments() {
 
-        Patient patient=patientRepositary.findByEmail(email).orElseThrow(()-> new PatientNotFoundException("patient  not found"));
-        List<Appointment> appointments=appointmentRepositary.findByPatient_Id(patient.getId());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        Patient patient = patientRepositary.findByUser_Email(email).orElseThrow(() -> new PatientNotFoundException("patient not found"));
+
+        List<Appointment> appointments = appointmentRepositary.findByPatient_Id(patient.getId());
 
         return appointments.stream().map(appointmentMapper::toDto).toList();
+    }
+
+    private void ensureAppointmentAccess(Appointment appointment) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return;
+        }
+
+        if (authentication == null
+                || !authentication.getName().equals(appointment.getPatient().getUser().getEmail())) {
+            throw new AccessDeniedException("You are not allowed to access this appointment");
+        }
     }
 
 

@@ -1,7 +1,6 @@
 package com.HMS.hospital_management_system.repositary;
 
 import com.HMS.hospital_management_system.entity.Appointment;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
@@ -29,7 +27,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             "AND a.endTime > :newStartTime")
     boolean hasOverlappingAppointment(
             @Param("doctorId") Long doctorId,
-            @Param("id") long id,
+            @Param("id") Long id,
             @Param("date") LocalDate date,
             @Param("newStartTime") LocalTime newStartTime,
             @Param("newEndTime") LocalTime newEndTime
@@ -50,17 +48,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     );
 
     @Query("SELECT COUNT(a) > 0 FROM Appointment a " +
-            "WHERE a.patient.id=:patientId " +
-            "AND a.id <> :id " +
-            "AND a.appointmentDate=:date " +
+            "WHERE a.patient.id = :patientId " +
+            "AND a.appointmentDate = :date " +
             "AND a.status <> com.HMS.hospital_management_system.enums.AppointmentStatus.CANCELLED " +
-            "AND  a.startTime < :EndTime " +
-            "AND a.endTime > :StartTime")
+            "AND a.startTime < :endTime " +
+            "AND a.endTime > :startTime")
     boolean hasOverlapping(
             @Param("patientId") Long patientId,
             @Param("date") LocalDate date,
-            @Param("StartTime") LocalTime StartTime,
-            @Param("EndTime") LocalTime EndTime
+            @Param("startTime") LocalTime StartTime,
+            @Param("endTime") LocalTime endTime
     );
 
     @Query("SELECT COUNT(a) > 0 FROM Appointment a " +

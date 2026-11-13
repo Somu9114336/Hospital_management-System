@@ -19,10 +19,10 @@ import java.util.Optional;
 
 @Service
 public class PatientServiceImpl implements PatientService {
-    private PatientRepositary patientRepositary;
-    private PatientMapper patientMapper;
-    private AppointmentRepository appointmentRepository;
-    private AppointmentMapper appointmentMapper;
+    private final PatientRepositary patientRepositary;
+    private final PatientMapper patientMapper;
+    private final AppointmentRepository appointmentRepository;
+    private final AppointmentMapper appointmentMapper;
 
     PatientServiceImpl(PatientRepositary patientRepositary, PatientMapper patientMapper,
                        AppointmentRepository appointmentRepository,AppointmentMapper appointmentMapper) {
@@ -33,18 +33,19 @@ public class PatientServiceImpl implements PatientService {
     }
 
 
-    public PatientResponseDto addPatient(PatientRequestDto dto) {
-        if (patientRepositary.findByEmail(dto.getEmail()).isPresent()) {
-            throw new RuntimeException("patient altreday exists");
-        }
-        Patient savedPatient = patientRepositary.save(patientMapper.toEntity(dto));
-
-        return patientMapper.toDto(savedPatient);
-    }
+//    public PatientResponseDto addPatient(PatientRequestDto dto) {
+//        if (patientRepositary.findByUser_Email(dto.getEmail()).isPresent()) {
+//            throw new RuntimeException("patient altreday exists");
+//        }
+//        Patient savedPatient = patientRepositary.save(patientMapper.toEntity(dto));
+//
+//        return patientMapper.toDto(savedPatient);
+//    }
 
     @Override
+
     public PatientResponseDto getPatient(String name) {
-        Patient patient = patientRepositary.findByName(name).orElseThrow(() -> new PatientNotFoundException("patient does not exists"));
+        Patient patient = patientRepositary.findByUser_Name(name).orElseThrow(() -> new PatientNotFoundException("patient does not exists"));
 
         return patientMapper.toDto(patient);
     }

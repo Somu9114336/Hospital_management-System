@@ -15,7 +15,6 @@ public class AppointmentMapper {
         Appointment appointment = new Appointment();
 
         Patient patient = new Patient();
-        patient.setId(dto.getPatientId());
 
         Doctors doctor = new Doctors();
         doctor.setId(dto.getDoctorId());
@@ -38,7 +37,6 @@ public class AppointmentMapper {
 
         dto.setPatientId(appointment.getPatient().getId());
         dto.setDoctorId(appointment.getDoctors().getId());
-        dto.setPatientName(appointment.getPatient().getName());
         dto.setDoctorName(appointment.getDoctors().getName());
         dto.setId(appointment.getId());
         dto.setAppointmentDate(appointment.getAppointmentDate());

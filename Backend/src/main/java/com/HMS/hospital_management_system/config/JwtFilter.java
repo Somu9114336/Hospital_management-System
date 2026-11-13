@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -45,16 +46,19 @@ public class JwtFilter extends OncePerRequestFilter {
                 System.out.println("AUTHENTICATION SET: " +
                         SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
 
-            }
-            else {
+            } else {
                 System.out.println("TOKEN IS INVALID");
             }
 
         }
         System.out.println("BEFORE FILTER CHAIN: " +
                 SecurityContextHolder.getContext().getAuthentication());
-
-        filterChain.doFilter(req,res);
+        System.out.println("REQUEST METHOD: " + req.getMethod());
+        System.out.println("REQUEST URI: " + req.getRequestURI());
+//        System.out.println("AUTHORITIES: " + c
+//                SecurityContextHolder.getContext()
+//                        .getAuthentication().getAuthorities());
+        filterChain.doFilter(req, res);
 
         System.out.println("AFTER FILTER CHAIN: " +
                 SecurityContextHolder.getContext().getAuthentication());

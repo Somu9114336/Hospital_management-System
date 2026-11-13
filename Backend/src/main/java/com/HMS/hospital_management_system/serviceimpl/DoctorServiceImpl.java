@@ -85,4 +85,13 @@ public class DoctorServiceImpl implements DoctorService {
         }
         return doctors.stream().map(doctorMapper::toDto).toList();
     }
+
+    @Override
+    public List<DoctorResponseDto> getByname(String name) {
+       List <Doctors> doctors= doctorRepository.findByName(name);
+       if(doctors.isEmpty()){
+           throw new DoctorNotFoundException("no doctor found with this name");
+       }
+       return doctors.stream().map(doctorMapper::toDto).toList();
+    }
 }

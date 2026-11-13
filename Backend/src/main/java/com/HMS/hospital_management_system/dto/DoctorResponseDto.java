@@ -8,6 +8,8 @@ import lombok.Data;
 
 @Data
 public class DoctorResponseDto {
+    private Long id;
+
     @NotBlank(message = "Doctor name is required")
     private String name;
 

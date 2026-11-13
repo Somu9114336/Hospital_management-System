@@ -65,4 +65,10 @@ public class DoctorController {
         doctorService.deletedoctor(id);
         return ResponseEntity.status(HttpStatus.OK).body("delete success");
     }
+
+    @GetMapping("/getbyname/{name}")
+    public ResponseEntity<List<DoctorResponseDto>> getDoctorByName(@PathVariable String name) {
+        List<DoctorResponseDto> res = doctorService.getByname(name);
+        return ResponseEntity.ok().body(res);
+    }
 }

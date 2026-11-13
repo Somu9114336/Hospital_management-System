@@ -3,7 +3,6 @@ package com.HMS.hospital_management_system.entity;
 import com.HMS.hospital_management_system.enums.AppointmentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,7 +27,7 @@ public class Appointment {
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
-    @Future(message = "Appointment dates must be in future")
+    @NotNull
     private LocalDate appointmentDate;
 
     @JsonFormat(pattern = "HH:mm:ss")

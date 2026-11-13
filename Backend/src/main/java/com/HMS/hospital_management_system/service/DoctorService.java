@@ -22,4 +22,5 @@ public interface DoctorService {
     void deletedoctor(Long id);
 
     List<DoctorResponseDto> getBySpecialization(String specialization);
+    List<DoctorResponseDto>getByname(String name);
 }

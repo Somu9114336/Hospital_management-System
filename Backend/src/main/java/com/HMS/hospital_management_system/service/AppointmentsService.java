@@ -19,7 +19,7 @@ public interface AppointmentsService {
    AppointmentResponseDto cancelAnAppointment(Long id);
    String RemoveAnAppointment(Long id);
 
-   List<AppointmentResponseDto> getMyAppointments(String email);
+   List<AppointmentResponseDto> getMyAppointments();
 
 
 }

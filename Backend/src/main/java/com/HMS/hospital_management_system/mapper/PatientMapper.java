@@ -4,6 +4,7 @@ import com.HMS.hospital_management_system.dto.PatientRequestDto;
 import com.HMS.hospital_management_system.dto.PatientResponseDto;
 import com.HMS.hospital_management_system.dto.UpdatePatientDto;
 import com.HMS.hospital_management_system.entity.Patient;
+import com.HMS.hospital_management_system.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,20 +14,18 @@ public class PatientMapper {
 
         Patient patient = new Patient();
 
-        patient.setName(dto.getName());
-        patient.setEmail(dto.getEmail());
         patient.setGender(dto.getGender());
         patient.setDateOfBirth(dto.getDateOfBirth());
-        patient.setPhone(dto.getPhone());
+
 
         return patient;
     }
 
     public PatientResponseDto toDto(Patient dto) {
         PatientResponseDto res = new PatientResponseDto();
-        res.setName(dto.getName());
-        res.setEmail(dto.getEmail());
-        res.setPhone(dto.getPhone());
+        res.setEmail(dto.getUser().getEmail());
+        res.setPhone(dto.getUser().getPhone());
+        res.setName(dto.getUser().getName());
         res.setGender(dto.getGender());
         res.setDateOfBirth(dto.getDateOfBirth());
 
@@ -34,20 +33,8 @@ public class PatientMapper {
 
     }
 
-    public Patient mapToUpdatePatientEntity(UpdatePatientDto dto,Patient patient) {
+    public Patient mapToUpdatePatientEntity(UpdatePatientDto dto, Patient patient) {
 
-
-        if (dto.getName() != null) {
-            patient.setName(dto.getName());
-        }
-
-        if (dto.getEmail() != null) {
-            patient.setEmail(dto.getEmail());
-        }
-
-        if (dto.getPhone() != null) {
-            patient.setPhone(dto.getPhone());
-        }
 
         if (dto.getDateOfBirth() != null) {
             patient.setDateOfBirth(dto.getDateOfBirth());

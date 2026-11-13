@@ -23,11 +23,11 @@ public class PatientController {
         this.patientService = patientService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<PatientResponseDto> addPatient(@Valid @RequestBody PatientRequestDto dto) {
-        PatientResponseDto res = patientService.addPatient(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
-    }
+//    @PostMapping("/add")
+//    public ResponseEntity<PatientResponseDto> addPatient(@Valid @RequestBody PatientRequestDto dto) {
+//        PatientResponseDto res = patientService.addPatient(dto);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+//    }
 
     @GetMapping("/get/{name}")
     public ResponseEntity<PatientResponseDto> getaPatient(@Valid @PathVariable("name") String name) {
